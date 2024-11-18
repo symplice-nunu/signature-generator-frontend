@@ -38,8 +38,21 @@ export default {
   methods: {
     async fetchUserCount() {
       try {
+        // Retrieve token from localStorage
+        const token = localStorage.getItem('token');
+        
+        if (!token) {
+          console.error("No token found in localStorage");
+          alert("You need to be logged in to access this data.");
+          return;
+        }
+        
         // Make API request to fetch the user count
-        const response = await axios.get('http://localhost:8080/api/auth/users/count');
+        const response = await axios.get('http://localhost:8080/api/v1/users/count', {
+          headers: {
+            Authorization: `Bearer ${token}`, // Include token in the request headers
+          },
+        });
         
         // Check if the response is successful
         if (response.data.success) {
@@ -55,3 +68,7 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+/* Add your custom styles here */
+</style>

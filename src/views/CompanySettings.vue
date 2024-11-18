@@ -213,124 +213,104 @@
 </template>
 
 <script>
-import axios from "axios"; // Import Axios for API calls
-import SidebarComponent from "../components/Sidebar.vue"; // Import Sidebar Component
+import axios from "axios";
+import SidebarComponent from "../components/Sidebar.vue";
 
 export default {
   name: "UserManagement",
   components: {
-    SidebarComponent, // Register Sidebar component
+    SidebarComponent,
   },
   data() {
     return {
-      users: [], // Array to hold user data
-      selectedUser: null, // Currently selected user for editing
-      newPhoneNumber: "", // For storing the new phone number
-      successMessage: "", // For success messages
-      showModal: false, // To control the visibility of the user edit modal
-      showPhoneModal: false, // To control the visibility of the phone update modal
+      users: [],
+      selectedUser: null,
+      newPhoneNumber: "",
+      successMessage: "",
+      showModal: false,
+      showPhoneModal: false,
     };
   },
   methods: {
-    // Fetch users from the API
     async fetchUsers() {
       try {
-        const response = await axios.get("http://localhost:8080/api/auth/users");
-        this.users = response.data;
+        const token = localStorage.getItem("token");
+        const response = await axios.get("http://localhost:8080/api/v1/users", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        console.log(response.data)
+        this.users =  response.data instanceof Array ? response.data : [response.data];
       } catch (error) {
         console.error("Error fetching users:", error);
-        alert("Failed to fetch users. Please try again later.");
+        // alert("Failed to fetch user count. Please try again later.");
       }
     },
 
-    // Open modal for editing user
     openModal(user) {
-      this.selectedUser = { ...user }; // Create a copy of the user data to prevent direct mutations
-      this.showModal = true; // Show the modal
+      this.selectedUser = { ...user };
+      this.showModal = true;
     },
 
-    // Close modal
     closeModal() {
-      this.showModal = false; // Close the modal
+      this.showModal = false;
     },
 
-    // Open modal for updating phone number
     openPhoneModal(user) {
-      this.selectedUser = user; // Set the user to update phone for
-      this.newPhoneNumber = user.phone; // Pre-fill the phone number field with current phone number
-      this.showPhoneModal = true; // Show the modal
+      this.selectedUser = user;
+      this.newPhoneNumber = user.phone;
+      this.showPhoneModal = true;
     },
 
-    // Close phone update modal
     closePhoneModal() {
-      this.showPhoneModal = false; // Close the phone modal
+      this.showPhoneModal = false;
     },
 
-    // Update user information (Name, Email, etc.)
     async updateUser() {
       try {
-        // Only update the necessary fields
+        const token = localStorage.getItem("token");
         const updateData = {
           companyName: this.selectedUser.companyName,
           missionStatement: this.selectedUser.missionStatement,
-          companyAddress: this.selectedUser.companyAddress,
-          companySite: this.selectedUser.companySite,
-          userTitle: this.selectedUser.userTitle,
         };
-
-        // Make PUT request to the API
         await axios.put(
-          `http://localhost:8080/api/auth/update-company-info?userId=${this.selectedUser.id}`,
-          updateData
+          `http://localhost:8080/api/v1/update-company-info?userId=${this.selectedUser.id}`,
+          updateData,
+          { headers: { Authorization: `Bearer ${token}` } }
         );
 
-        // Update the local user data
         const index = this.users.findIndex((u) => u.id === this.selectedUser.id);
         if (index !== -1) {
           this.users[index] = { ...this.selectedUser };
         }
-
-        // Show success message
         this.successMessage = "User updated successfully!";
-
-        // Hide the success message after 3 seconds
-        setTimeout(() => {
-          this.successMessage = "";
-        }, 3000);
-
-        this.closeModal(); // Close the modal after updating
+        setTimeout(() => { this.successMessage = ""; }, 3000);
+        this.closeModal();
       } catch (error) {
-        console.error("Error updating user:", error.response ? error.response.data : error);
-        alert("Failed to update user. Please try again later.");
+        console.error("Error updating user:", error);
       }
     },
 
-    // Update Phone Number
     async updatePhoneNumber() {
       try {
-        await axios.put(`http://localhost:8080/api/auth/update-phone?userId=${this.selectedUser.id}`, {
-          phone: this.newPhoneNumber,
-        });
+        const token = localStorage.getItem("token");
+        await axios.put(
+          `http://localhost:8080/api/v1/update-phone?userId=${this.selectedUser.id}`,
+          { phone: this.newPhoneNumber },
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
 
-        // Update phone number in the local users array
         const index = this.users.findIndex((user) => user.id === this.selectedUser.id);
         if (index !== -1) {
-          this.users[index].phone = this.newPhoneNumber; // Update the phone number
+          this.users[index].phone = this.newPhoneNumber;
         }
-
         this.successMessage = "Phone number updated successfully!";
-        setTimeout(() => {
-          this.successMessage = ""; // Hide success message after 3 seconds
-        }, 3000);
-
-        this.closePhoneModal(); // Close the phone update modal
+        setTimeout(() => { this.successMessage = ""; }, 3000);
+        this.closePhoneModal();
       } catch (error) {
-        console.error("Error updating phone number:", error.response ? error.response.data : error);
-        alert("Failed to update phone number. Please try again later.");
+        console.error("Error updating phone number:", error);
       }
     },
 
-    // Open the signature URL in a new tab and copy user details to clipboard
     createOutlookSignature(user) {
       // Open Outlook signature settings in a new tab
       window.open("https://outlook.office.com/mail/options/accounts-category/signatures-subcategory", "_blank");
@@ -357,7 +337,7 @@ export default {
     },
   },
   mounted() {
-    this.fetchUsers(); // Fetch users when the component is mounted
+    this.fetchUsers();
   },
 };
 </script>

@@ -5,6 +5,9 @@
         {{ loginError }}
       </div>
       <h1 class="text-2xl font-bold mb-6 text-center">Login</h1>
+      <div v-if="loginSuccess" class="mb-4 p-3 text-center text-teal-700 bg-teal-100 border border-teal-400 rounded">
+        {{ loginSuccessMessage }}
+      </div>
       <form @submit.prevent="handleLogin">
         <div class="mb-4">
           <label for="email" class="block text-gray-700 font-medium mb-2">Email</label>
@@ -30,7 +33,6 @@
           />
           <p v-if="passwordError" class="text-sm text-red-500 mt-1">{{ passwordErrorMessage }}</p>
         </div>
-        <p v-if="loginSuccess" class="text-sm text-green-500 my-4">{{ loginSuccessMessage }}</p>
         <p class="text-right text-sm text-gray-500 my-4">
           <router-link to="/reset-password" class="text-teal-500 hover:underline">Reset Password</router-link>
         </p>
@@ -117,16 +119,23 @@ export default {
       try {
         const response = await axios.post("http://localhost:8080/api/auth/login", loginData);
         console.log("Login successful:", response.data);
+        
+        // Store the token in localStorage
+        if (response.data.token) {
+          localStorage.setItem('token', response.data.token);
+        }
+        
         this.loginSuccess = true;
         this.loginSuccessMessage = "Login successful! Redirecting...";
         this.loginError = "";
 
         // Optionally clear the form after success
-        this.email = "";
-        this.password = "";
+        
 
         // Redirect to another page after login (e.g., dashboard)
         setTimeout(() => {
+          this.email = "";
+          this.password = "";
           this.$router.push("/dashboard"); // Adjust the path as needed
         }, 2000); // Wait 2 seconds before redirecting
       } catch (error) {

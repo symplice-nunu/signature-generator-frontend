@@ -43,6 +43,12 @@ import axios from 'axios'; // Import Axios for making API requests
 
 export default {
   name: 'SidebarComponent',
+  created() {
+    // Check authentication when component is created
+    if (!localStorage.getItem('token')) {
+      this.logout();
+    }
+  },
   methods: {
     // Method to handle logout
     async logout() {
@@ -52,15 +58,17 @@ export default {
         
         // Check if the response is successful
         if (response.data.success) {
-          // Redirect user to the login page or perform other necessary actions
+          // Clear the token from localStorage
+          localStorage.removeItem('token');
+          
           this.$router.push('/login');  // Assuming your login page route is "/login"
-          alert('Logged out successfully!');
+          // alert('Logged out successfully!');
         } else {
-          alert('Logout failed. Please try again.');
+          // alert('Logout failed. Please try again.');
         }
       } catch (error) {
         console.error('Error during logout:', error);
-        alert('An error occurred during logout. Please try again.');
+        // alert('An error occurred during logout. Please try again.');
       }
     },
   },
