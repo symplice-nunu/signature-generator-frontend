@@ -235,7 +235,7 @@ export default {
     async fetchUsers() {
       try {
         const token = localStorage.getItem("token");
-        const response = await axios.get("http://localhost:8080/api/v1/users", {
+        const response = await axios.get("http://signaturegenerator.samueldev.com/api/v1/users", {
           headers: { Authorization: `Bearer ${token}` },
         });
         console.log(response.data)
@@ -273,7 +273,7 @@ export default {
           missionStatement: this.selectedUser.missionStatement,
         };
         await axios.put(
-          `http://localhost:8080/api/v1/update-company-info?userId=${this.selectedUser.id}`,
+          `http://signaturegenerator.samueldev.com/api/v1/update-company-info?userId=${this.selectedUser.id}`,
           updateData,
           { headers: { Authorization: `Bearer ${token}` } }
         );
@@ -294,7 +294,7 @@ export default {
       try {
         const token = localStorage.getItem("token");
         await axios.put(
-          `http://localhost:8080/api/v1/update-phone?userId=${this.selectedUser.id}`,
+          `http://signaturegenerator.samueldev.com/api/v1/update-phone?userId=${this.selectedUser.id}`,
           { phone: this.newPhoneNumber },
           { headers: { Authorization: `Bearer ${token}` } }
         );

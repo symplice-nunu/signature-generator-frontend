@@ -206,7 +206,7 @@ export default {
       };
 
       try {
-        const response = await axios.post('http://localhost:8080/api/auth/signup', userData);
+        const response = await axios.post('http://signaturegenerator.samueldev.com/api/auth/signup', userData);
         console.log('User registered successfully:', response.data);
         this.signupSuccess = true;
         this.signupError = '';

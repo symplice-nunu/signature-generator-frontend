@@ -48,7 +48,7 @@ export default {
         }
         
         // Make API request to fetch the user count
-        const response = await axios.get('http://localhost:8080/api/v1/users/count', {
+        const response = await axios.get('http://signaturegenerator.samueldev.com/api/v1/users/count', {
           headers: {
             Authorization: `Bearer ${token}`, // Include token in the request headers
           },
